@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Recipes {
+  id           Int                  @id @default(autoincrement())
+  name         String               @unique
+  difficulty   String
+  cooking_time String
+  vegetarion   Boolean
+  gluten_free  Boolean
+  steps        String
+  serving_size String
+  nutri_info   String
+  created_at   DateTime             @default(now())
+  ingredients  Recipe_Ingredients[]
+  ratings      User_Ratings[]
+  saves        User_Saves[]
+}
+
+model Ingredients {
+  id         Int                  @id @default(autoincrement())
+  name       String               @unique
+  created_at DateTime             @default(now())
+  recipes    Recipe_Ingredients[]
+}
+
+model Recipe_Ingredients {
+  id            Int      @id @default(autoincrement())
+  recipe_id     Int
+  ingredient_id Int
+  optional      Boolean
+  created_at    DateTime @default(now())
+
+  recipe     Recipes     @relation(fields: [recipe_id], references: [id])
+  ingredient Ingredients @relation(fields: [ingredient_id], references: [id])
+}
+
+model Users {
+  id         Int             @id @default(autoincrement())
+  email      String          @unique
+  password   String
+  username   String          @unique
+  created_at DateTime        @default(now())
+  searches   User_Searches[]
+  ratings    User_Ratings[]
+  saves      User_Saves[]
+}
+
+model User_Searches {
+  id         Int      @id @default(autoincrement())
+  search     String
+  user_id    Int
+  created_at DateTime @default(now())
+
+  user Users @relation(fields: [user_id], references: [id])
+}
+
+model User_Ratings {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  recipe_id  Int
+  created_at DateTime @default(now())
+
+  user   Users   @relation(fields: [user_id], references: [id])
+  recipe Recipes @relation(fields: [recipe_id], references: [id])
+}
+
+model User_Saves {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  recipe_id  Int
+  created_at DateTime @default(now())
+
+  user   Users   @relation(fields: [user_id], references: [id])
+  recipe Recipes @relation(fields: [recipe_id], references: [id])
+}
+
+model Tokens {
+  id          Int      @id @default(autoincrement())
+  token       String
+  expiry_time DateTime @default(now())
+}
