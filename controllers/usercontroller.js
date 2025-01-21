@@ -39,7 +39,7 @@ class usercontroller {
                         console.error("Token creation failed:", error);
                         return res.status(500).send({"message": "Token creation failed."});
                     }
-                    return res.send({"message" : "Verified","token":`${token}`});
+                    return res.send({"message" : "Verified","token":`${token}`,"id":data.id,"username":data.username});
                 }
                 else {
                     throw Error;
@@ -51,7 +51,7 @@ class usercontroller {
             }
         }
         else {
-            handleZodError(res,parseResult.error);
+            this.handleZodError(res,parseResult.error);
         }
     }
     signup = async (req,res)=> {
@@ -72,7 +72,7 @@ class usercontroller {
                     console.error("Token creation failed:", error);
                     return res.status(500).send({"message": "Token creation failed."});
                 }
-                return res.send({"message" : "Verified","token":`${token}`});
+                return res.send({"message" : "Verified","token":`${token}`,"id":data.id,"username":data.username});
             }
             catch (error)
             {
@@ -85,7 +85,7 @@ class usercontroller {
     
         }
         else {
-            handleZodError(res,parseResult.error);
+            this.handleZodError(res,parseResult.error);
         }
     }
     logout = async (req,res) => {

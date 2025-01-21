@@ -8,6 +8,8 @@ import { data as dummyData } from "../data.js";
 const saltRounds = 10;
 const stub = ClarifaiStub.grpc();
 
+
+//https://clarifai.com/clarifai/main/models/food-item-recognition
 // Your PAT (Personal Access Token)
 const PAT = process.env.PAT || "";
 // Specify the correct user_id/app_id pairings

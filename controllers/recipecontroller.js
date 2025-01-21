@@ -10,9 +10,96 @@ class RecipeController {
     return res.send(recipes);
   }
 
+  getRecipe = async (req,res) => {
+    const id = req.params.id;
+    const user_id = req.body.user_id;
+    console.log(id);
+    if(id==null)
+    {
+      return res.send(null);
+    }
+    const recipe = await prisma.recipes.findUnique({
+      where: {
+        id: Number(id)
+      },
+      include: {
+        ingredients: {
+          select: {
+            ingredient: {
+              select: {
+                name: true,
+              },
+            },
+
+            optional: true,
+          },
+        },
+      },
+    });
+    if(recipe)
+    {
+      await prisma.user_Searches.create({
+        data: {
+          user_id: user_id,
+          recipe_id: recipe.id,
+          created_at: new Date().toISOString()
+        }
+      })
+      return res.send(recipe);
+
+    }
+    return res.send(null);
+  }
+  recentViews = async (req,res) => {
+    const user_id = req.params.id;
+    if(user_id==null)
+    {
+      return res.send(null);
+    }
+    const recents = await prisma.user_Searches.findMany({
+      where: {
+        user_id: Number(user_id)
+      },
+      select: {
+        recipe_id:true
+      },
+      distinct: ['recipe_id'],
+      orderBy:{
+        created_at: "desc"
+      },
+      take:5,
+    });
+    const filterdRecents = recents.map((item)=>item.recipe_id)
+    const recipes = await prisma.recipes.findMany({
+      where: {
+        id: {
+          in: filterdRecents
+        }
+      },
+      include: {
+        ingredients: {
+          select: {
+            ingredient: {
+              select: {
+                name: true,
+              },
+            },
+            optional: true,
+          },
+        },
+      },
+    });
+    if(recipes)
+    {
+      return res.send(recipes);
+    }
+    return res.send(null);
+  }
+
+
   findRecipe =async (req, res) => {
     // req.files will be null if no file is upload or wrong file type is uploaded 
-    if (!req.files || req.files.length == 0 || req.body.ingredients == []) {
+    if (!req.files && req.files?.length == 0 && req.body.ingredients == []) {
         return res.status(400).json({ error: 'No files or ingredients selected.' });
       }
     if (req.files && req.files.length > 0) {
@@ -50,14 +137,15 @@ class RecipeController {
         const flattenedIngredients = [].concat(...allIngredients); // Flatten the array of ingredients
         console.log(allIngredients, flattenedIngredients);
         const recipes = await this.fetchRecipes(flattenedIngredients);
-        return res.send(recipes);
+        return res.send({recipes,"ingredientList":flattenedIngredients});
       } catch (error) {
         return res.status(500).send(error.message); // Handle errors properly
       }
     } else {
       const ingredientList = req.body.ingredients;
+      console.log(ingredientList);
       const recipes = await this.fetchRecipes(ingredientList);
-      return res.send(recipes);
+      return res.send({recipes,ingredientList});
     }
   }
   fetchRecipes = async (ingredientList) => {
@@ -66,11 +154,19 @@ class RecipeController {
         where: {
           ingredients: {
             every: {
-              ingredient: {
-                name: {
-                  in: ingredientList, // List of ingredient names
+              OR: [
+                {
+                  optional: true, // Allow optional ingredients to be ignored
                 },
-              },
+                {
+                  optional: false, // Non-optional ingredients must be in the list
+                  ingredient: {
+                    name: {
+                      in: ingredientList,
+                    },
+                  },
+                },
+              ],
             },
           },
         },
@@ -82,12 +178,13 @@ class RecipeController {
                   name: true,
                 },
               },
-
               optional: true,
             },
           },
         },
       });
+      
+      
       const formattedRecipes = recipes.map((recipe) => ({
         ...recipe,
         ingredients: recipe.ingredients.map((i) => ({
@@ -99,6 +196,15 @@ class RecipeController {
     } catch (error) {
       return error.message;
     }
+  }
+
+  getIngredients = async(req,res)=> {
+    const results = await prisma.ingredients.findMany({
+      select : {name:true}
+    });
+    const ingredients = results.map((ing)=>ing.name);
+
+    res.send(ingredients);;
   }
 }
 

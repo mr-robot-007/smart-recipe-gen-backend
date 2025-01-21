@@ -29,6 +29,6 @@ export const verifyToken = async function(req,res,next)
         }
     } catch (error) {
         console.log(error.message);
-        return res.status(200).send({"message":error.message});
+        return res.status(401).send({"message":error.message});
     }
 }

@@ -17,6 +17,7 @@ datasource db {
 model Recipes {
   id           Int                  @id @default(autoincrement())
   name         String               @unique
+  image        String?
   difficulty   String
   cooking_time String
   vegetarion   Boolean
@@ -28,6 +29,7 @@ model Recipes {
   ingredients  Recipe_Ingredients[]
   ratings      User_Ratings[]
   saves        User_Saves[]
+  searches     User_Searches[]
 }
 
 model Ingredients {
@@ -61,11 +63,12 @@ model Users {
 
 model User_Searches {
   id         Int      @id @default(autoincrement())
-  search     String
+  recipe_id  Int
   user_id    Int
   created_at DateTime @default(now())
 
-  user Users @relation(fields: [user_id], references: [id])
+  user   Users   @relation(fields: [user_id], references: [id])
+  recipe Recipes @relation(fields: [recipe_id], references: [id])
 }
 
 model User_Ratings {

@@ -9,7 +9,7 @@ import cors from "cors";
 const app = express();
 
 let corsOptions = {
-  origin : ['*'],
+  origin : '*',
   methods: ['GET', 'POST'], // Specify allowed methods
   allowedHeaders: ['Authorization', 'Content-Type','access_token','Access-Control-Allow-Origin'], // Specify allowed headers
 }
@@ -40,7 +40,7 @@ app.use(cors(corsOptions));
 app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// app.use(verifyToken);
+app.use(verifyToken);
 
 
 
