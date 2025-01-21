@@ -10,6 +10,7 @@ export const verifyToken = async function(req,res,next)
     if (nonSecurePaths.includes(req.path)) return next();
     let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
     console.log("Headers:", req.headers);
+console.log("_name:",process.env.TOKEN_HEADER_KEY);
 console.log("Token:", req.header(process.env.TOKEN_HEADER_KEY));
 console.log("JWT Secret Key:", process.env.JWT_SECRET_KEY);
     let jwtSecretKey = process.env.JWT_SECRET_KEY;

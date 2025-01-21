@@ -6,7 +6,7 @@ class RecipeController {
 
    getAllRecipes = async(req, res) =>  {
     const recipes = await prisma.recipes.findMany();
-    console.log(recipes);
+    // console.log(recipes);
     return res.send(recipes);
   }
 
