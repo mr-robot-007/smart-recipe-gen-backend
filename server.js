@@ -11,7 +11,7 @@ const app = express();
 let corsOptions = {
   origin : '*',
   methods: ['GET', 'POST'], // Specify allowed methods
-  allowedHeaders: ['Authorization', 'Content-Type','access_token','Access-Control-Allow-Origin'], // Specify allowed headers
+  allowedHeaders: ['Authorization', 'Content-Type','token','Access-Control-Allow-Origin'], // Specify allowed headers
 }
 
 
