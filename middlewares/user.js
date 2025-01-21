@@ -9,6 +9,7 @@ export const verifyToken = async function(req,res,next)
     const nonSecurePaths = ['/user/login','/user/signup'];
     if (nonSecurePaths.includes(req.path)) return next();
     let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+    console.log("tokenHeaderKey" , tokenHeaderKey);
     let jwtSecretKey = process.env.JWT_SECRET_KEY;
     try {
         const token = req.header(tokenHeaderKey);
